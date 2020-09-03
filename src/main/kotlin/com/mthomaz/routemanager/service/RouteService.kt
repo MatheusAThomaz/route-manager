@@ -1,11 +1,13 @@
 package com.mthomaz.routemanager.service
 
-import com.mthomaz.routemanager.models.RouteModel
+import com.mthomaz.routemanager.models.RouteDTO
 import com.mthomaz.routemanager.config.repository.RedisRouteDefinitionRepository
+import com.mthomaz.routemanager.utils.RouteUtils
 import org.springframework.cloud.gateway.filter.FilterDefinition
 import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition
 import org.springframework.cloud.gateway.route.RouteDefinition
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.net.URI
 
@@ -13,7 +15,7 @@ import java.net.URI
 @Service
 class RouteService(private val routeDefinitionRepository: RedisRouteDefinitionRepository) {
 
-    fun save(route: RouteModel): Mono<Void>? {
+    fun save(route: RouteDTO): Mono<Void>? {
 
         val routeDefinition = RouteDefinition()
 
@@ -22,21 +24,25 @@ class RouteService(private val routeDefinitionRepository: RedisRouteDefinitionRe
         routeDefinition.filters = extractFilters(route.filters)
         routeDefinition.predicates = extractPredicates(route.predicates)
 
-//        val prefixPathFilterDefinition = FilterDefinition(
-//                "GatewayLogFilter")
-//
-//        routeDefinition.filters = listOf(prefixPathFilterDefinition)
-
-
-//        val pathRoutePredicateDefinition = PredicateDefinition(
-//                "Path=/mock/route/**")
-//
-//        routeDefinition.predicates = arrayListOf(pathRoutePredicateDefinition)
-
         return routeDefinitionRepository.save(Mono.just(routeDefinition)).map {
             return@map it
         }
     }
+
+    fun get(): Flux<List<RouteDTO>> {
+
+        val routeDefinition = ArrayList<RouteDefinition>()
+
+        return routeDefinitionRepository.getRouteDefinitions().map {
+            if (it != null) {
+                routeDefinition.add(it)
+            }
+        }.map {
+            return@map RouteUtils.routeDefinitionToDTO(routeDefinition)
+        }
+
+    }
+
 
 
     fun extractFilters(filters: List<String>): List<FilterDefinition> {
@@ -58,5 +64,6 @@ class RouteService(private val routeDefinitionRepository: RedisRouteDefinitionRe
 
         return definitions
     }
+
 
 }

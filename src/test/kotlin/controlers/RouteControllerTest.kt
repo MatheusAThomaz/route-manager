@@ -1,0 +1,4 @@
+package controlers
+
+class RouteControllerTest {
+}
