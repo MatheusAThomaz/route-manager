@@ -29,18 +29,14 @@ class RouteService(private val routeDefinitionRepository: RedisRouteDefinitionRe
         }
     }
 
-    fun get(): Flux<List<RouteDTO>> {
 
-        val routeDefinition = ArrayList<RouteDefinition>()
+    fun get(): Flux<RouteDTO> {
+
+        val routeDefinition = ArrayList<RouteDTO>()
 
         return routeDefinitionRepository.getRouteDefinitions().map {
-            if (it != null) {
-                routeDefinition.add(it)
-            }
-        }.map {
-            return@map RouteUtils.routeDefinitionToDTO(routeDefinition)
+            it?.let { it1 -> RouteUtils.routeDefinitionToDTO(it1) }
         }
-
     }
 
 

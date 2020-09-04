@@ -21,7 +21,7 @@ class RouteController(
     }
 
     @GetMapping
-    fun toggles(): Flux<List<RouteDTO>> {
+    fun toggles(): Flux<RouteDTO> {
         return routeService.get()
     }
 

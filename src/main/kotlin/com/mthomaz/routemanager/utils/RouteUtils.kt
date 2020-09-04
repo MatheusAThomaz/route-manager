@@ -9,20 +9,9 @@ class RouteUtils {
 
     companion object {
 
-        fun routeDefinitionToDTO(routeDefinition: List<RouteDefinition>): List<RouteDTO> {
+        fun routeDefinitionToDTO(routeDefinition: RouteDefinition): RouteDTO {
 
-            val routes: ArrayList<RouteDTO> = ArrayList()
-
-            routeDefinition.forEach {
-
-                val filters = it.filters.map { it2 ->
-                    it2.name
-                }
-
-                routes.add(RouteDTO(it.id, it.filters.map { it.name }, it.predicates.map { it.name }, it.uri.toString()))
-            }
-
-            return routes
+            return RouteDTO(routeDefinition.id, routeDefinition.filters.map { it.name }, routeDefinition.predicates.map { it.name.plus("=").plus(it.args["_genkey_0"]) }, routeDefinition.uri.toString())
 
         }
     }
